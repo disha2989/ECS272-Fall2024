@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2023", "DOM", "DOM.Iterable", "es6"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strictNullChecks": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+  },
+  "include": ["src", "vite.config.ts"]
+}

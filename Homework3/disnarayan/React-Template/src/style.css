@@ -1,0 +1,235 @@
+:root {
+  --primary-bg: #f0f2f5;
+  --card-bg: #ffffff;
+  --primary-text: #1a365d;
+  --secondary-text: #4a5568;
+  --border-color: #e2e8f0;
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  background-color: var(--primary-bg);
+  color: var(--primary-text);
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-header {
+  padding: 1rem 2rem;
+  background-color: var(--card-bg);
+  box-shadow: var(--shadow-sm);
+  z-index: 10;
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.app-header p {
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+  flex: 1;
+  overflow: hidden;
+  margin: 2rem 0;
+}
+
+/* Updated dashboard card styles without hover transform */
+.dashboard-card {
+  background: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Removed hover effects from dashboard view */
+.dashboard-card .chart-container {
+  pointer-events: none;
+}
+
+.card-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.card-header h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-header p {
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+}
+
+.card-content {
+  flex: 1;
+  min-height: 0;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-footer {
+  padding: 1rem;
+  text-align: center;
+  background-color: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+}
+
+.app-footer p {
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+}
+
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--card-bg);
+  border-radius: 8px;
+  width: 90vw;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+  font-size: 1.2rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--secondary-text);
+  padding: 0.5rem;
+  line-height: 1;
+}
+
+.modal-body {
+  flex: 1;
+  overflow: hidden;
+  padding: 1.5rem;
+}
+
+/* Chart container styles */
+.chart-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-container svg {
+  width: 100%;
+  height: 100%;
+  background: none;
+  border: none;
+}
+
+/* Modal view specific styles */
+.modal-view {
+  width: 100%;
+  height: 100%;
+}
+
+.modal-view .chart-container {
+  pointer-events: auto;
+}
+
+/* Tooltip styles */
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 8px;
+  box-shadow: var(--shadow-sm);
+  z-index: 1000;
+  transition: opacity 0.2s;
+}
+
+/* Hide tooltips in dashboard view */
+.dashboard-card .tooltip {
+  display: none;
+}
+
+/* Interactive elements styles for modal view */
+.modal-view .chart-container .bar:hover,
+.modal-view .chart-container .pie-segment:hover,
+.modal-view .chart-container .node:hover,
+.modal-view .chart-container .chord:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+/* Disable interactions in dashboard view */
+.dashboard-card .chart-container .bar,
+.dashboard-card .chart-container .pie-segment,
+.dashboard-card .chart-container .node,
+.dashboard-card .chart-container .chord {
+  pointer-events: none;
+}
+
+/* Modal view specific hover effects */
+.modal-view .chart-container path:hover,
+.modal-view .chart-container circle:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+/* Selection styles for modal view */
+.modal-view .chart-container .selected {
+  stroke: var(--primary-text);
+  stroke-width: 2px;
+}
+

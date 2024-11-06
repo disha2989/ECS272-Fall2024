@@ -1,0 +1,38 @@
+{
+  "name": "react-template",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^5.16.7",
+    "@types/d3": "^7.4.3",
+    "@types/d3-sankey": "^0.12.4",
+    "@types/lodash": "^4.17.7",
+    "axios": "^1.2.1",
+    "d3": "^7.9.0",
+    "d3-sankey": "^0.12.3",
+    "lodash": "^4.17.21",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.13.0",
+    "topojson-client": "^3.1.0",
+    "usehooks-ts": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/material-ui": "^0.21.17",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "globals": "^15.9.0",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.1"
+  }
+}
