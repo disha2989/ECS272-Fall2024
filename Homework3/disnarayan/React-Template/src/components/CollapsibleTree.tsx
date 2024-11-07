@@ -22,6 +22,7 @@ interface CourseCategory {
 }
 
 const CollapsibleTree: React.FC<VisualizationProps> = ({ isModalView = false }) => {
+  
   const [data, setData] = useState<TreeNode | null>(null);
   const [selectedView, setSelectedView] = useState<string>('All');
   const containerRef = useRef<HTMLDivElement>(null);
