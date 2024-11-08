@@ -31,21 +31,30 @@ const StackedBarChart: React.FC<VisualizationProps> = ({ isModalView = false }) 
     { name: 'Treatment', column: 'Did you seek any specialist for a treatment?' }
   ];
 
+  // Helper function to capitalize each word for display purposes
+  const formatValue = (value: string) => {
+    return value
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   useEffect(() => {
     csv('/data/StudentMentalhealth.csv').then((csvData) => {
       const processedData: DataPoint[] = [];
       const currentCategory = categories.find(cat => cat.name === selectedCategory);
       
       if (currentCategory) {
-        const uniqueValues = Array.from(new Set(csvData.map(d => d[currentCategory.column] || '')))
-          .filter(value => value);
-        
+        const uniqueValues = Array.from(
+          new Set(csvData.map(d => (d[currentCategory.column] || '').toLowerCase()))
+        ).filter(value => value);
+
         uniqueValues.forEach(value => {
-          const count = csvData.filter(d => d[currentCategory.column] === value).length;
+          const count = csvData.filter(d => (d[currentCategory.column] || '').toLowerCase() === value).length;
           processedData.push({ category: selectedCategory, value, count });
         });
       }
-      
+
       setData(processedData.sort((a, b) => b.count - a.count));
     });
   }, [selectedCategory]);
@@ -135,7 +144,7 @@ const StackedBarChart: React.FC<VisualizationProps> = ({ isModalView = false }) 
               .style('top', `${event.pageY - 10}px`)
               .html(`
                 <div class="p-2">
-                  <strong>${d.value}</strong><br/>
+                  <strong>${formatValue(d.value)}</strong><br/>
                   Count: ${d.count}<br/>
                   Percentage: ${((d.count / data.reduce((acc, curr) => acc + curr.count, 0)) * 100).toFixed(1)}%
                 </div>
@@ -183,7 +192,7 @@ const StackedBarChart: React.FC<VisualizationProps> = ({ isModalView = false }) 
     g.append('g')
       .attr('class', 'x-axis')
       .attr('transform', `translate(0,${innerHeight})`)
-      .call(axisBottom(x))
+      .call(axisBottom(x).tickFormat(formatValue))
       .style('font-size', '12px');
 
     // Y Axis
@@ -210,7 +219,7 @@ const StackedBarChart: React.FC<VisualizationProps> = ({ isModalView = false }) 
         .attr('x', 20)
         .attr('y', 10)
         .style('font-size', '12px')
-        .text(d.value);
+        .text(formatValue(d.value));
     });
 
   }, [data, selectedCategory, isModalView]);

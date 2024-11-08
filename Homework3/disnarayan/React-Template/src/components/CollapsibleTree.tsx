@@ -22,7 +22,6 @@ interface CourseCategory {
 }
 
 const CollapsibleTree: React.FC<VisualizationProps> = ({ isModalView = false }) => {
-  
   const [data, setData] = useState<TreeNode | null>(null);
   const [selectedView, setSelectedView] = useState<string>('All');
   const containerRef = useRef<HTMLDivElement>(null);
@@ -155,7 +154,6 @@ const CollapsibleTree: React.FC<VisualizationProps> = ({ isModalView = false }) 
       const csvData = await csv('/data/StudentMentalhealth.csv');
       
       if (selectedView === 'All') {
-        // Create hierarchical structure with "All Students" root
         const root: TreeNode = {
           name: 'All Students',
           children: [],
@@ -168,7 +166,6 @@ const CollapsibleTree: React.FC<VisualizationProps> = ({ isModalView = false }) 
           }
         };
 
-        // Process all categories
         categories.forEach(category => {
           const categoryNode = processCategoryData(category, csvData);
           if (categoryNode.metadata!.total > 0) {
@@ -182,7 +179,6 @@ const CollapsibleTree: React.FC<VisualizationProps> = ({ isModalView = false }) 
 
         setData(root);
       } else {
-        // For specific category views, create a single category tree
         const selectedCategory = categories.find(cat => cat.name === selectedView);
         if (selectedCategory) {
           const categoryNode = processCategoryData(selectedCategory, csvData);
@@ -211,21 +207,58 @@ const CollapsibleTree: React.FC<VisualizationProps> = ({ isModalView = false }) 
       .attr('width', width)
       .attr('height', height);
 
+    const positionTooltip = (event: MouseEvent, tooltipContent: string) => {
+      const tooltip = d3.select(tooltipRef.current);
+      
+      tooltip.html(tooltipContent);
+      
+      const tooltipNode = tooltip.node() as HTMLDivElement;
+      const tooltipRect = tooltipNode.getBoundingClientRect();
+      
+      let left = event.pageX + 10;
+      let top = event.pageY - 10;
+      
+      // Check right boundary
+      if (left + tooltipRect.width > window.innerWidth) {
+        left = event.pageX - tooltipRect.width - 10;
+      }
+      
+      // Check bottom boundary
+      if (top + tooltipRect.height > window.innerHeight) {
+        top = event.pageY - tooltipRect.height - 10;
+      }
+      
+      // Check left boundary
+      if (left < 0) {
+        left = 10;
+      }
+      
+      // Check top boundary
+      if (top < 0) {
+        top = 10;
+      }
+      
+      tooltip
+        .style('left', `${left}px`)
+        .style('top', `${top}px`)
+        .style('opacity', 1);
+    };
+
     // Add legend
     const legend = svg.append('g')
       .attr('class', 'legend')
-      .attr('transform', `translate(${margin.left}, ${height - 60})`);  // Moved to bottom
+      .attr('transform', `translate(${margin.left}, ${height - 60})`);
 
     const legendItems = [
       { color: COLORS.withConditions, label: 'Mental Health Conditions Reported' },
       { color: COLORS.noConditions, label: 'No Conditions Reported' }
     ];
 
-    const legendSpacing = 25; // Vertical spacing between items
+    const legendSpacing = 25;
     
     legendItems.forEach((item, i) => {
       const legendItem = legend.append('g')
-        .attr('transform', `translate(0, ${i * legendSpacing})`);  // Stack vertically
+        .attr('transform', `translate(0, ${i * legendSpacing})`);
 
       legendItem.append('circle')
         .attr('r', 6)
@@ -241,15 +274,12 @@ const CollapsibleTree: React.FC<VisualizationProps> = ({ isModalView = false }) 
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Create tree layout
     const treeLayout = d3.tree<TreeNode>()
       .size([innerHeight, innerWidth]);
 
-    // Create hierarchy
     const root = d3.hierarchy(data);
     const treeData = treeLayout(root);
 
-    // Create links
     const links = g.selectAll('.link')
       .data(treeData.links())
       .join('path')
@@ -261,14 +291,12 @@ const CollapsibleTree: React.FC<VisualizationProps> = ({ isModalView = false }) 
       .style('stroke', COLORS.link)
       .style('stroke-width', 1.5);
 
-    // Create nodes
     const nodes = g.selectAll('.node')
       .data(treeData.descendants())
       .join('g')
       .attr('class', 'node')
       .attr('transform', d => `translate(${d.y},${d.x})`);
 
-    // Add node circles
     nodes.append('circle')
       .attr('r', d => d.data.metadata?.total ? Math.sqrt(d.data.metadata.total) * 3 : 5)
       .attr('class', 'node-circle')
@@ -289,20 +317,17 @@ const CollapsibleTree: React.FC<VisualizationProps> = ({ isModalView = false }) 
 
         const metadata = d.data.metadata;
         if (metadata) {
-          d3.select(tooltipRef.current)
-            .style('opacity', 1)
-            .style('left', `${event.pageX + 10}px`)
-            .style('top', `${event.pageY - 10}px`)
-            .html(`
-              <div class="p-3 bg-white rounded shadow">
-                <strong>${d.data.name}</strong><br/>
-                Total Students: ${metadata.total}<br/>
-                Depression: ${((metadata.depression / metadata.total) * 100).toFixed(1)}%<br/>
-                Anxiety: ${((metadata.anxiety / metadata.total) * 100).toFixed(1)}%<br/>
-                Panic Attacks: ${((metadata.panic / metadata.total) * 100).toFixed(1)}%<br/>
-                Seeking Treatment: ${((metadata.treatment / metadata.total) * 100).toFixed(1)}%
-              </div>
-            `);
+          const tooltipContent = `
+            <div class="p-3 bg-white rounded shadow">
+              <strong>${d.data.name}</strong><br/>
+              Total Students: ${metadata.total}<br/>
+              Depression: ${((metadata.depression / metadata.total) * 100).toFixed(1)}%<br/>
+              Anxiety: ${((metadata.anxiety / metadata.total) * 100).toFixed(1)}%<br/>
+              Panic Attacks: ${((metadata.panic / metadata.total) * 100).toFixed(1)}%<br/>
+              Seeking Treatment: ${((metadata.treatment / metadata.total) * 100).toFixed(1)}%
+            </div>
+          `;
+          positionTooltip(event as unknown as MouseEvent, tooltipContent);
         }
       })
       .on('mouseout', function() {
@@ -315,7 +340,6 @@ const CollapsibleTree: React.FC<VisualizationProps> = ({ isModalView = false }) 
           .style('opacity', 0);
       });
 
-    // Add labels
     nodes.append('text')
       .attr('dy', '0.31em')
       .attr('x', d => d.children ? -8 : 8)
@@ -360,9 +384,15 @@ const CollapsibleTree: React.FC<VisualizationProps> = ({ isModalView = false }) 
         ref={tooltipRef}
         className={`tooltip ${isModalView ? '' : 'hidden'}`}
         style={{
-          position: 'absolute',
+          position: 'fixed',
           opacity: 0,
           pointerEvents: 'none',
+          zIndex: 1000,
+          maxWidth: '300px',
+          backgroundColor: 'white',
+          borderRadius: '4px',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+          padding: '8px'
         }}
       />
     </div>

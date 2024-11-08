@@ -4,6 +4,7 @@ import PieChart from './components/PieChart';
 import SankeyDiagram from './components/CollapsibleTree';
 import ChordDiagram from './components/ChordDiagram';
 import VisualizationWrapper from './components/VisualizationWrapper';
+import MentalHealthSankey from './components/MentalHealthSankey';
 
 const App: React.FC = () => {
   return (
@@ -40,6 +41,13 @@ const App: React.FC = () => {
           description="Correlations between age groups and mental health conditions"
         >
           <ChordDiagram />
+        </VisualizationWrapper>
+
+        <VisualizationWrapper
+          title="Mental Health Flow Analysis"
+          description="Flow analysis of age groups, study years, conditions, and treatment"
+        >
+          <MentalHealthSankey />
         </VisualizationWrapper>
       </div>
 
