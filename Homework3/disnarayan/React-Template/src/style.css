@@ -40,12 +40,14 @@ body {
 }
 
 .app-header h1 {
+  
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
 }
 
 .app-header p {
   color: var(--secondary-text);
+  max-width: 800px;  /* Limit width for better readability */
   font-size: 0.9rem;
 }
 
@@ -57,6 +59,9 @@ body {
   flex: 1;
   overflow: hidden;
   margin: 2rem 0;
+  margin: 2rem auto; /* Changed from 2rem 0 to auto */
+  max-width: 1200px; /* Add max-width to contain the grid */
+  justify-items: center;
 }
 
 /* Updated dashboard card styles without hover transform */
@@ -68,6 +73,9 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  width: 500px;
+  height: 100px;  
+  
 }
 
 /* Removed hover effects from dashboard view */
@@ -78,16 +86,19 @@ body {
 .card-header {
   padding: 1rem;
   border-bottom: 1px solid var(--border-color);
+  text-align: center;
 }
 
 .card-header h2 {
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
+  text-align: center;
 }
 
 .card-header p {
   font-size: 0.9rem;
   color: var(--secondary-text);
+  text-align: center;
 }
 
 .card-content {

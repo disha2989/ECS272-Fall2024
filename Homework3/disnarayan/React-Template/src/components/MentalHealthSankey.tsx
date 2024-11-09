@@ -8,12 +8,18 @@ import { VisualizationProps } from '../types';
 interface SankeyNode {
   name: string;
   category: string;
+  x0?: number;
+  x1?: number;
+  y0?: number;
+  y1?: number;
+  value?: number;
 }
 
 interface SankeyLink {
-  source: number;
-  target: number;
+  source: number | SankeyNode;
+  target: number | SankeyNode;
   value: number;
+  width?: number;
 }
 
 interface ProcessedData {
@@ -23,6 +29,7 @@ interface ProcessedData {
 
 const MentalHealthSankey: React.FC<VisualizationProps> = ({ isModalView = false }) => {
   const [data, setData] = useState<ProcessedData>({ nodes: [], links: [] });
+  const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -112,7 +119,6 @@ const MentalHealthSankey: React.FC<VisualizationProps> = ({ isModalView = false 
 
     processData();
   }, []);
-  
 
   useEffect(() => {
     if (!data.nodes.length || !svgRef.current || !containerRef.current) return;
@@ -122,7 +128,7 @@ const MentalHealthSankey: React.FC<VisualizationProps> = ({ isModalView = false 
     const containerHeight = container.clientHeight;
 
     // Adjusted margins and dimensions
-    const margin = { top: 25, right: 25, bottom: 75, left: 25};
+    const margin = { top: 25, right: 25, bottom: 75, left: 25 };
     const width = containerWidth - margin.left - margin.right;
     const height = containerHeight - margin.top - margin.bottom;
 
@@ -137,7 +143,7 @@ const MentalHealthSankey: React.FC<VisualizationProps> = ({ isModalView = false 
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Adjusted Sankey generator
+    // Sankey generator
     const sankeyGenerator = sankey<SankeyNode, SankeyLink>()
       .nodeWidth(10)
       .nodePadding(8)
@@ -148,10 +154,39 @@ const MentalHealthSankey: React.FC<VisualizationProps> = ({ isModalView = false 
       links: data.links.map(d => ({ ...d }))
     });
 
-    // Color scale
-    const colorScale = scaleOrdinal<string>()
-      .domain(['year', 'age', 'condition', 'treatment'])
-      .range(['#3B82F6', '#F97316', '#10B981', '#8B5CF6']);
+    // Updated color scales with gradients for ordinal values
+    const yearColorScale = scaleOrdinal<string>()
+      .domain(['Year 1', 'Year 2', 'Year 3', 'Year 4'])
+      .range(['#9CB4D9', '#7393C5', '#4B72B2', '#23519E']); // Blue gradient
+
+    const ageColorScale = scaleOrdinal<string>()
+      .domain(['18-20', '21-22', '23-24'])
+      .range(['#FFB399', '#FF8C66', '#FF6633']); // Orange gradient
+
+    const conditionColorScale = scaleOrdinal<string>()
+      .domain(['No Conditions', 'Depression', 'Anxiety', 'Panic Attack', 'Multiple Conditions'])
+      .range(['#10B981', '#059669', '#047857', '#065F46', '#064E3B']); // Green variations
+
+    // Updated treatment colors to match the screenshot
+    const treatmentColorScale = scaleOrdinal<string>()
+      .domain(['Sought Treatment', 'No Treatment'])
+      .range(['#4F46E5', '#818CF8']); // New indigo/purple colors
+
+    // Node color function
+    const getNodeColor = (node: SankeyNode) => {
+      switch (node.category) {
+        case 'year':
+          return yearColorScale(node.name);
+        case 'age':
+          return ageColorScale(node.name);
+        case 'condition':
+          return conditionColorScale(node.name);
+        case 'treatment':
+          return treatmentColorScale(node.name);
+        default:
+          return '#gray';
+      }
+    };
 
     // Draw links
     const links_g = g.append('g')
@@ -160,7 +195,7 @@ const MentalHealthSankey: React.FC<VisualizationProps> = ({ isModalView = false 
       .join('path')
       .attr('d', sankeyLinkHorizontal())
       .attr('fill', 'none')
-      .attr('stroke', d => colorScale((d.source as SankeyNode).category))
+      .attr('stroke', d => getNodeColor(d.source as SankeyNode))
       .attr('stroke-width', d => Math.max(1, d.width || 0))
       .attr('opacity', 0.5);
 
@@ -173,10 +208,10 @@ const MentalHealthSankey: React.FC<VisualizationProps> = ({ isModalView = false 
       .attr('y', d => d.y0 || 0)
       .attr('height', d => (d.y1 || 0) - (d.y0 || 0))
       .attr('width', d => (d.x1 || 0) - (d.x0 || 0))
-      .attr('fill', d => colorScale(d.category))
+      .attr('fill', d => getNodeColor(d))
       .attr('opacity', 0.8);
 
-    // Add labels without counts
+    // Add labels
     g.append('g')
       .selectAll('text')
       .data(nodes)
@@ -185,7 +220,7 @@ const MentalHealthSankey: React.FC<VisualizationProps> = ({ isModalView = false 
       .attr('y', d => ((d.y1 || 0) + (d.y0 || 0)) / 2)
       .attr('dy', '0.35em')
       .attr('text-anchor', d => (d.x0 || 0) < width / 2 ? 'start' : 'end')
-      .text(d => d.name) // Only show name, no count
+      .text(d => d.name)
       .style('font-size', '10px')
       .style('font-weight', '500');
 
